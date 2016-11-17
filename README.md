@@ -1,7 +1,7 @@
 # Fancy
 Fairly atypical nontrivial collections library
 
-A collection of custom Collection implementations that have been missing in java.util.Collections.
+A collection of custom Collection implementations that have been missing in Java 1.6's java.util.Collections.
 
 
 Release

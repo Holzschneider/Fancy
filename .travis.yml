@@ -1,0 +1,18 @@
+language: java
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+  - $HOME/.m2
+
+after_success:
+  - ./deploy.sh
+ 
+env:
+  global:
+    - GH_ACCOUNT=Holzschneider
+    - GH_REPOSITORY=Fancy
+    - secure: "qUGnxdqgj1Z6n3Zm2uXQvOcjwrm0f4/AymusmCyeYB9CBo1JyExwxN7Swcb3/WXXRLntLG7pL/XiEohl3CUHbodYJsh32NhNLlOr3v5xnR0KZ1jVgX8sUdHu8oDqzf4ZsrJWrD7iabShcPUhLovsSa4Y4wMTns+0dANIdW5x3hb2voaSte+JNdg7rTiS88U9no3cGQYwsQn9+pe1BSJSfUhCPTRWnS8txgxibiMGopsV3WvzLWafO/sbgIct38H2iJaAZlsGsPvyNQ4U6s97bfH4N02IQ2XgkbkFyySQkkU/g+4SDpjp6Fh6v6DCZILWjU7ZfqOJHu4yv9W0XX9BI5TahYB8WLmSdj1gFnnE+CXK/8Hfzpg63wgFHuPi9aCQC5kfa/GAfYTIVWfSps6xXII2QuKUIJgR6Vd6pwLnX4zGCpg/BX0uc8XqtLvI7MSYrGP/lXw7kmnzB5rnxtk90O5iVMJp1tM5Z1glSWnNTBvpogVVtfVKA2+wfjMfqN+yB2QcxqGm0puLogaZ6/Z0yMdLbh5EiXnM56xo7avrREGhhR7ARs7TUoNjgQwI56eiAVG8/CcMrAfIwlpkPIFy07ORbJ6MNUzziC7eYo1Omik2+j57YvRgwSU3MpaWnV8ASUlqEOpSXD+lWze1RIfM71xzpibyREJcfZ15scorrHw="
