@@ -13,6 +13,23 @@ import java.util.Set;
 public class ArrayMap<K,V> implements Map<K,V>, Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	
+	@SuppressWarnings("unchecked")
+	public ArrayMap(Object[][] table) {
+		for (Object[] keyValue: table)
+			if (keyValue.length!=2)
+				throw new IllegalArgumentException("Initializer table has to be of dimension [x][2]");
+			else
+				if (this.put((K)keyValue[0],(V)keyValue[1])!=null)
+					throw new IllegalArgumentException("Initializer table must not contain dupes.");
+	};
+	
+	public ArrayMap(Map<? extends K,? extends V> m) {
+		for (Entry<? extends K,? extends V> e: m.entrySet())
+			put(e.getKey(),e.getValue());
+	}
+	
+	
 	public final ArraySet<Map.Entry<K, V>> entries = new ArraySet<Map.Entry<K,V>>();
 	public final Set<K> keys = new Keys(); 
 	public final Collection<V> values= new Values(); 
