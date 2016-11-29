@@ -12,4 +12,18 @@ public abstract class Converter<Q,E> implements Iterator<Q> {
 	public void remove() { inner.remove(); }
 	
 	abstract public Q convert(E e);
+	
+	
+	
+	static public<A,B>  Converter<A,B> on(Iterator<B> i, final Conversion<A,B> c) {
+		return new Converter<A, B>(i) {
+			public A convert(B b) {
+				return c.convert(b);
+			}
+		};
+	}
+	
+	public static interface Conversion<Q,E> {
+		public Q convert(E e);
+	}
 }

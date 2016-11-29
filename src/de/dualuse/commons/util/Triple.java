@@ -1,15 +1,14 @@
 package de.dualuse.commons.util;
 
 
-public class Triple<X,Y,Z> {
-	public final X a;
-	public final Y b;
-	public final Z c;
+public class Triple<X,Y,Z> extends Pair<X,Y>{
+	private static final long serialVersionUID = 1L;
+	
+	public final Z third;
 
 	public Triple(X a, Y b, Z c) {
-		this.a=a;
-		this.b=b;
-		this.c=c;
+		super(a,b);
+		this.third = c;
 	}
 	
 	static public<A,B,C> Triple<A,B,C> of(A a, B b, C c) {
@@ -19,11 +18,11 @@ public class Triple<X,Y,Z> {
 	@Override
 	public boolean equals(Object obj) {
 		Triple<?,?,?> that = (Triple<?,?,?>)obj;
-		return this.a.equals(that.a) && this.b.equals(that.b) && this.c.equals(that.c);
+		return this.first.equals(that.first) && this.second.equals(that.second) && this.third.equals(that.third);
 	}
 	
 	@Override
 	public int hashCode() {
-		return a.hashCode()^b.hashCode()^c.hashCode();
+		return first.hashCode()^second.hashCode()^third.hashCode();
 	}
 }
