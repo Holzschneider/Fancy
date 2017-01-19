@@ -1,18 +1,31 @@
 package de.dualuse.commons.util;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 //XXX TODO make it work on Android!
 @SuppressWarnings("unchecked")
 public class Sticky<T extends Serializable> implements Serializable {
+	static public interface Getter<Q extends Serializable> {
+		public Q get();
+	}
+
+	static private class Passthrough<R extends Serializable> implements Getter<R> {
+		Sticky<R> reference;
+		
+		public Passthrough(Sticky<R> reference) {
+			this.reference = reference;
+		}
+		
+		@Override
+		public R get() {
+			return reference.value;
+		}
+	}
+	
+	
+	
+	
+	
 	private static final long serialVersionUID = 1L;
 
 	static String APP = new LinkedList<Class<?>>(Arrays.asList(new SecurityManager() { protected Class<?>[] getClassContext() { return super.getClassContext(); } }.getClassContext())).getLast().getName();
@@ -27,6 +40,11 @@ public class Sticky<T extends Serializable> implements Serializable {
 		public void run() {
 			try {
 				ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(persistentStore));
+				
+				for (Collection<Sticky<?>> cs: registered.values())
+					for (Sticky<?> s: cs)
+						s.update();
+
 				oos.writeObject(registered);
 				oos.close();
 			} catch (Exception ex) {
@@ -39,6 +57,7 @@ public class Sticky<T extends Serializable> implements Serializable {
 		if (persistentStore.exists())
 			try {
 				ObjectInputStream oos = new ObjectInputStream(new FileInputStream(persistentStore));
+				
 				restored = (LinkedHashMap<String, List<Sticky<? extends Serializable>>>) oos.readObject();
 				oos.close();
 			} catch (Exception ex) {
@@ -47,8 +66,12 @@ public class Sticky<T extends Serializable> implements Serializable {
 			Runtime.getRuntime().addShutdownHook(saver); 
 	}
 	
-	
-	public Sticky(T defaultValue) { this(identifierForStacktTrace(), defaultValue); }
+
+	public Sticky(Getter<T> ret) { this(ret.get(), ret); }
+	public Sticky(T defaultValue) { this(identifierForStackTrace(), defaultValue); }
+	public Sticky(T defaultValue, Getter<T> ret) { this(defaultValue); this.ret = ret; }
+	public Sticky(String identifier, Getter<T> ret) { this(identifier, ret.get(), ret);  }
+	public Sticky(String identifier, T defaultValue, Getter<T> ret) { this(identifier, defaultValue); this.ret = ret; }	
 	public Sticky(String identifier, T defaultValue) {
 		List<Sticky<? extends Serializable>> dupes = registered.get(identifier);
 		if (dupes == null)
@@ -75,21 +98,19 @@ public class Sticky<T extends Serializable> implements Serializable {
 
 	private T value = null;
 	private T initial = null;
-	
+	private transient Getter<T> ret = new Passthrough<T>(this);
+
+	public Sticky<T> update() { value = ret.get(); return this; }
 	public Sticky<T> reset() { value = initial; return this; }
 	public Sticky<T> set(T value) { this.value = value; return this; }
 	public T get() { return this.value; }
 	
+	public static<T extends Serializable> T value(Getter<T> v) { return new Sticky<T>(v).get(); }
+	public static<T extends Serializable> T value(T v) { return new Sticky<T>(v).get(); }
+	public static<T extends Serializable> T value(String identifier, T v) { return new Sticky<T>(identifier, v).get(); }
+	public static<T extends Serializable> T value(String identifier, Getter<T> v) { return new Sticky<T>(identifier, v).get(); }
 	
-	public static<T extends Serializable> T value(T v) {
-		return new Sticky<T>(v).get();
-	}
-	
-	public static<T extends Serializable> T value(String identifier, T v) {
-		return new Sticky<T>(identifier, v).get();
-	}
-	
-	static public String identifierForStacktTrace() {
+	static public String identifierForStackTrace() {
 		String identifier = "";
 		for (StackTraceElement ste: new Exception().getStackTrace())
 			identifier += ste.getClassName()+".";
